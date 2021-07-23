@@ -2,17 +2,17 @@
 
 # How to run application
 
-'''
+```
 git clone https://github.com/vishal2612200/tutorbin-django-assignment.git
-'''
+```
 
-'''
+```
 cd tutorbin-django-assignment
-'''
+```
 
-'''
+```
 python manage.py runserver
-'''
+```
 
 # Credits for test user
 
@@ -21,9 +21,9 @@ password: 123456
 
 ## command to create supper user
 
-'''
+```
 python manage.py createsuperuser
-'''
+```
 
 ## How to create custom tags for image
 
@@ -39,7 +39,12 @@ You can create tags through django admin
 
 ### Note
 
-I have given minimum eﬀort in beautifying the project (UI/Frontend)
+I have given minimum eﬀort in beautifying the project (UI/Frontend) as per the instructions
 
+# Tech Stack
 
+Django, HTML, CSS, Javascript, Jquery, AJAX
 
+## Database
+
+sqlite
