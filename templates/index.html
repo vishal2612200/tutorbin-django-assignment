@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Mutliple Upload Image</title>
+    <style>
+        img {
+            height: 200px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="images" multiple>
+        
+        <select name="tags" multiple>
+        
+        {% for tag in tags %}
+        <option value="{{ tag.name }}"> {{ tag.name }} </option>
+        {% endfor %}
+
+        </select>
+
+        <button type="submit">Upload Multiple Images</button>
+    </form>
+    <hr>
+        {% for tag in tags %}
+        <input  class="selection-box" type="checkbox" id="{{ tag.name }}" name="{{ tag.name }}" value="{{ tag.name }}">
+        <label for="{{ tag.name }}"> {{ tag.name }}</label>
+        {% endfor %}
+        <br>
+    <hr>
+    <div class="allimage">
+        {% for img in images %}
+            <a href='{% url "gallery:specific_image"  img.pk  %}' target="_blank"> 
+                <img id="allimg" src="{{img.image.url}}" alt="Image">
+            </a>
+        {% endfor %}
+
+        <hr>
+        {% if images.has_other_pages %}
+        <ul >
+            {% if images.has_previous %}
+            <li><a href="?page={{ images.previous_page_number }}">&laquo;</a></li>
+            {% else %}
+            <li class="disabled"><span>&laquo;</span></li>
+            {% endif %}
+            {% for i in images.paginator.page_range %}
+            {% if images.number == i %}
+                <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+            {% else %}
+                <li><a href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+            {% endfor %}
+            {% if images.has_next %}
+            <li><a href="?page={{ images.next_page_number }}">&raquo;</a></li>
+            {% else %}
+            <li class="disabled"><span>&raquo;</span></li>
+            {% endif %}
+        </ul>
+        {% endif %}
+    </div>
+    <hr>
+    <!-- filtered image will append here-->
+    <div class ="filterimage">
+
+    </div>
+
+    {% block javascript %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            // catch the form's submit event
+            $('.selection-box').on('change',function () {
+
+                var matches = '';
+                var count = 0;
+
+                // loop through all checkboxes
+                $(".selection-box:checked").each(function() {
+                    // if at least one checkbox is checked
+                    if (count>0){
+                        matches += ',' + this.value;
+                    }
+                    else{
+                        matches+=this.value
+                    }
+                    count+=1
+                });
+
+                // data to be sent with ajax
+                var ajax_get_data = {
+                    "value": matches
+                }
+
+                // create an AJAX call
+                $.ajax({
+                    data: ajax_get_data, // get the form data
+                    url: "{% url 'gallery:upload' %}",
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+
+                    // on success
+                    success: function (response) {
+                        
+                        var pictures = response.data;
+
+                        // check response data length then show all image gallery according to condition
+                        if(pictures.length>0){
+                            $('.allimage').hide();
+                        }
+                        else{
+
+                            $('.allimage').show();
+                            $('p#filterimage').remove();
+                        }
+                        // make pre-append div container empty for new response
+                         $('div.filterimage').empty();
+                        // Iterate over all picture and append inside single container
+                         for (const [key, value] of Object.entries(pictures)) {
+                           // image tag string
+                            var img = '<a href="/image/'+key+'/" target="_blank" > <img src="'+ value +'" alt="Image" > </a>';
+                            
+                            $('div.filterimage').append(img);
+                        }
+                        $('div.filterimage').append("<p id='filterimage'> Filtered images</p>");       
+                    },
+                    // on error
+                    error: function (response) {
+                        // alert the error if any error occured
+                        console.log(response.responseJSON.errors)
+                    }
+                });
+                return false;
+            });
+        })
+    </script>
+    {% endblock javascript %}
+</body>
+</html>

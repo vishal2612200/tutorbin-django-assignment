@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Specific Image</title>
+</head>
+<body>
+  
+    <img id="img" src="{{ image.image.url}}"/>
+
+    <button onclick="negrotate()">-90 deg</button>
+    <button onclick="posrotate()">+90 deg</button>
+    <button onclick="saveimage({{ image.id}})">Save Rotated Image</button>
+    <div class ="filterimage">
+
+    </div>
+
+    {% block javascript %}
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+
+    var rotate_value = 0;
+
+    function negrotate() {
+        // function to rotate image -90 degrees
+
+        rotate_value -= 90;
+        
+        document.querySelector("#img").style.transform = "rotate(" + rotate_value.toString() + "deg)";
+    }
+    function posrotate() {
+        // function to rotate image +90 degrees
+
+        rotate_value += 90;
+        
+        document.querySelector("#img").style.transform = "rotate(" + rotate_value.toString() + "deg)";
+    }
+
+    function  saveimage(image_id) {
+            
+        // ajax_call data 
+        var ajax_get_data = {
+            "value": rotate_value,
+            "image_id": image_id
+            }
+
+        $.ajax({
+                data: ajax_get_data, // get the form data
+                url: "{% url 'gallery:save_rotated_image' %}",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+                // on success
+                success: function (response) {
+                    // reinitialize the rotate_value
+                    rotate_value = 0;
+                    $('div.filterimage').append("<p id='filterimage'> Successfully Rotated, Refresh the page to verify results</p>"); 
+                
+                },
+                // on error
+                error: function (response) {
+                    // alert the error if any error occured
+                    console.log(response.responseJSON.errors)
+                }
+            });
+        }
+    </script>
+    {% endblock javascript %}
+</body>
+</html>
