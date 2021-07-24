@@ -1,5 +1,9 @@
 # tutorbin-django-assignment
 
+# Note
+
+Please run the application in incognito mode, as image can be cached without it, making difficult to observe saved rotated image. 
+
 # How to run application
 
 ```
